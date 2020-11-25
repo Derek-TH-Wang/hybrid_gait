@@ -238,7 +238,8 @@ class PPO1(ActorCriticRLModel):
                     else:
                         raise NotImplementedError
 
-                    logger.log("********** Iteration %i ************" % iters_so_far)
+                    if is_root:
+                        logger.log("********** Iteration %i ************" % iters_so_far)
 
                     seg = seg_gen.__next__()
 
@@ -270,8 +271,10 @@ class PPO1(ActorCriticRLModel):
 
                     # set old parameter values to new parameter values
                     self.assign_old_eq_new(sess=self.sess)
-                    logger.log("Optimizing...")
-                    logger.log(fmt_row(13, self.loss_names))
+
+                    if is_root:
+                        logger.log("Optimizing...")
+                        logger.log(fmt_row(13, self.loss_names))
 
                     # Here we do a bunch of optimization epochs over the data
                     for k in range(self.optim_epochs):
@@ -305,16 +308,22 @@ class PPO1(ActorCriticRLModel):
 
                             self.adam.update(grad, self.optim_stepsize * cur_lrmult)
                             losses.append(newlosses)
-                        logger.log(fmt_row(13, np.mean(losses, axis=0)))
+                        
+                        if is_root:
+                            logger.log(fmt_row(13, np.mean(losses, axis=0)))
 
-                    logger.log("Evaluating losses...")
+                    if is_root:
+                        logger.log("Evaluating losses...")
+
                     losses = []
                     for batch in dataset.iterate_once(optim_batchsize):
                         newlosses = self.compute_losses(batch["ob"], batch["ob"], batch["ac"], batch["atarg"],
                                                         batch["vtarg"], cur_lrmult, sess=self.sess)
                         losses.append(newlosses)
                     mean_losses, _, _ = mpi_moments(losses, axis=0)
-                    logger.log(fmt_row(13, mean_losses))
+                    if is_root:
+                        logger.log(fmt_row(13, mean_losses))
+
                     for (loss_val, name) in zipsame(mean_losses, self.loss_names):
                         logger.record_tabular("loss_" + name, loss_val)
                     logger.record_tabular("ev_tdlam_before", explained_variance(vpredbefore, tdlamret))
@@ -344,7 +353,7 @@ class PPO1(ActorCriticRLModel):
                     logger.record_tabular("EpisodesSoFar", episodes_so_far)
                     logger.record_tabular("TimestepsSoFar", self.num_timesteps)
                     logger.record_tabular("TimeElapsed", time.time() - t_start)
-                    if self.verbose >= 1 and MPI.COMM_WORLD.Get_rank() == 0:
+                    if self.verbose >= 1 and is_root == 0:
                         logger.dump_tabular()
         callback.on_training_end()
 

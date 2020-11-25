@@ -7,11 +7,37 @@ import random
 import argparse
 import numpy as np
 from mpi4py import MPI
+import tensorflow as tf
 
 from stable_baselines import PPO1
 from stable_baselines.common.policies import MlpPolicy
 from stable_baselines.common.vec_env import DummyVecEnv
 from stable_baselines.common.callbacks import CheckpointCallback
+
+
+
+def build_env():
+    env = gym.make('Pendulum-v0')
+    return env
+
+
+def build_agent(env, num_procs, timesteps_per_actorbatch, optim_batchsize, output_dir):
+    policy_kwargs = {
+        "net_arch": [{"pi": [64, 64],
+                      "vf": [64, 64]}],
+        "act_fun": tf.nn.relu
+    }
+    timesteps_per_actorbatch = int(
+        np.ceil(float(timesteps_per_actorbatch) / num_procs))
+    optim_batchsize = int(np.ceil(float(optim_batchsize) / num_procs))
+
+    agent = PPO1(MlpPolicy, env, 
+                 timesteps_per_actorbatch=timesteps_per_actorbatch,
+                 optim_batchsize=optim_batchsize,
+                 policy_kwargs=policy_kwargs,
+                 tensorboard_log=output_dir, 
+                 verbose=1)
+    return agent
 
 
 def train(agent, env, num_train_episodes, output_dir="", int_save_freq=0):
@@ -71,8 +97,12 @@ def main():
 
     num_procs = MPI.COMM_WORLD.Get_size()
 
-    env = gym.make('Pendulum-v0')
-    agent = PPO1(MlpPolicy, env, tensorboard_log="output", verbose=1)
+    env = build_env()
+    agent = build_agent(env=env,
+                        num_procs=num_procs,
+                        timesteps_per_actorbatch=training_params["timesteps_per_actorbatch"],
+                        optim_batchsize=training_params["optim_batchsize"],
+                        output_dir=training_params["output_dir"])
 
     if training_params["model_file"] != "":
         agent.load_parameters(training_params["model_file"])
