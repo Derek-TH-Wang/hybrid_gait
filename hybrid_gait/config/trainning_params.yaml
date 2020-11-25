@@ -1,0 +1,9 @@
+hybrid_gait:
+  mode: "train"
+  # model_file: "output/model.zip"
+  model_file: ""
+  output_dir: "output"
+  num_train_episodes: 1000000000 # train times
+  num_test_episodes: 10000 # test times
+  int_save_freq: 0 # specifies the frequency for saving intermediate policies every n policy steps.
+
