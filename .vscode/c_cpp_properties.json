@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "name": "PYTHON",
+            "includePath": [
+                "~/RL/algorithm/motion_imitation/**"
+            ]
+        }
+    ],
+    "version": 4
+}
