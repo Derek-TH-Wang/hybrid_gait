@@ -1,9 +1,9 @@
 hybrid_gait:
-  mode: "train"
-  # model_file: "output/model.zip"
-  model_file: ""
-  timesteps_per_actorbatch: 256
-  optim_batchsize: 64
+  mode: "test"
+  model_file: "output/model.zip"
+  # model_file: ""
+  timesteps_per_actorbatch: 4096
+  optim_batchsize: 256
   output_dir: "output"
   num_train_episodes: 1000000000 # train times
   num_test_episodes: 10000 # test times
