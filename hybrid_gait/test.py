@@ -1,23 +1,40 @@
-import gym
-
 import os
-import time
 import yaml
-import random
 import argparse
 import numpy as np
 from mpi4py import MPI
 import tensorflow as tf
+import gym
+from gym import envs
+from gym.envs.registration import register
 
 from stable_baselines import PPO1
 from stable_baselines.common.policies import MlpPolicy
-from stable_baselines.common.vec_env import DummyVecEnv
 from stable_baselines.common.callbacks import CheckpointCallback
 
 
+def regist(task_env):
+    if task_env == 'HybridGait-v0':
+        register(
+            id=task_env,
+            entry_point='hybrid_gait.hybrid_gait_gym:HybridGaitGym',
+        )
+        from hybrid_gait import hybrid_gait_gym
+    else:
+        print("register None")
+        return None
+    # We check that it was really registered
+    all_envs = envs.registry.all()
+    env_ids = [env_spec.id for env_spec in all_envs]
+    assert (task_env in env_ids), "The Task_Robot_ENV given is not Registered ==>" + str(task_env)
 
-def build_env():
-    env = gym.make('Pendulum-v0')
+    print(str(task_env)+" Registed")
+    return task_env
+
+
+def build_env(task_env):
+    task_env = regist(task_env)
+    env = gym.make(task_env)
     return env
 
 
@@ -84,7 +101,7 @@ def test(agent, env, num_procs, num_episodes=None):
 
 def main():
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument("--task", dest="task", type=str, default="hybrid_gait")
+    arg_parser.add_argument("--task", dest="task", type=str, default="HybridGait-v0")
     args = arg_parser.parse_args()
 
     with open('hybrid_gait/config/trainning_params.yaml') as f:
@@ -97,7 +114,7 @@ def main():
 
     num_procs = MPI.COMM_WORLD.Get_size()
 
-    env = build_env()
+    env = build_env(args.task)
     agent = build_agent(env=env,
                         num_procs=num_procs,
                         timesteps_per_actorbatch=training_params["timesteps_per_actorbatch"],

@@ -1,4 +1,4 @@
-hybrid_gait:
+HybridGait-v0:
   mode: "test"
   model_file: "output/model.zip"
   # model_file: ""
