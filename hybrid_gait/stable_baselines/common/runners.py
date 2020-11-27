@@ -148,16 +148,16 @@ def traj_segment_generator(policy, env, horizon, reward_giver=None, gail=False, 
         actions[i] = action[0]
         episode_starts[i] = episode_start
 
-        clipped_action = action
-        # Clip the actions to avoid out of bound error
-        if isinstance(env.action_space, gym.spaces.Box):
-            clipped_action = np.clip(action, env.action_space.low, env.action_space.high)
+        # clipped_action = action
+        # # Clip the actions to avoid out of bound error
+        # if isinstance(env.action_space, gym.spaces.Box):
+        #     clipped_action = np.clip(action, env.action_space.low, env.action_space.high)
 
         if gail:
-            reward = reward_giver.get_reward(observation, clipped_action[0])
-            observation, true_reward, done, info = env.step(clipped_action[0])
+            reward = reward_giver.get_reward(observation, action[0])
+            observation, true_reward, done, info = env.step(action[0])
         else:
-            observation, reward, done, info = env.step(clipped_action[0])
+            observation, reward, done, info = env.step(action[0])
             true_reward = reward
 
         if callback is not None:
