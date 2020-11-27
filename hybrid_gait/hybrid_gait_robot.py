@@ -215,6 +215,7 @@ class HybridGaitRobot(object):
         #     gait_param[i] = gait_param[i].item()
         self.cpp_gait_ctrller.set_gait_param(convert_type(gait_param))
         for num_repeat in range(self.action_repeat):
+            # time.sleep(0.5)
             self._run()
             obs = self._get_obs(obs)
             self._robot_dist += np.sqrt(((self.base_position[0] - self._last_base_pos[0])**2 +

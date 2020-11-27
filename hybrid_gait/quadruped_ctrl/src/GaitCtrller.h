@@ -95,6 +95,7 @@ StructPointer toque_calculator(double imuData[], double motorData[]) {
   StructPointer p = (StructPointer)malloc(sizeof(StructPointerTest));
   double eff[12];
   gCtrller->ToqueCalculator(imuData, motorData, eff);
+  // std::cout << "eff = ";
   for (int i = 0; i < 12; i++) {
     p->eff[i] = eff[i];
     // std::cout << p->eff[i] << " ";

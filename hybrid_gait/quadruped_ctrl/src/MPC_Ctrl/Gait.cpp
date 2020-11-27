@@ -93,27 +93,34 @@ Vec4<float> MixedFrequncyGait::getContactState() {
 
 Vec4<float> OffsetDurationGait::getSwingState()
 {
-  Array4f swing_offset = _offsetsFloat + _durationsFloat;
+  Array4f swing_offset = _offsetsFloat + _durationsFloat; // swing start phase
   for(int i = 0; i < 4; i++)
     if(swing_offset[i] > 1) swing_offset[i] -= 1.;
   Array4f swing_duration = 1. - _durationsFloat;
 
   Array4f progress = _phase - swing_offset;
-
+  // std::cout << "_phase = " << _phase << " swing_offset = " << swing_offset.transpose() << std::endl;
   for(int i = 0; i < 4; i++)
   {
     if(progress[i] < 0) progress[i] += 1.f;
+    // std::cout << "progress = " << progress[i] << " ";
     if(progress[i] > swing_duration[i])
     {
       progress[i] = 0.;
     }
     else
     {
-      progress[i] = progress[i] / swing_duration[i];
+      if(swing_duration[i] < 0.0000000001) {
+        progress[i] = 0.0;
+      } else {
+        progress[i] = progress[i] / swing_duration[i];
+      }
+      // progress[i] = progress[i] / swing_duration[i];
     }
   }
-
-  //printf("swing state: %.3f %.3f %.3f %.3f\n", progress[0], progress[1], progress[2], progress[3]);
+  // std::cout << std::endl;
+  // std::cout << "swing_duration = " << swing_duration.transpose() << std::endl;
+  // printf("swing state: %.3f %.3f %.3f %.3f\n\n", progress[0], progress[1], progress[2], progress[3]);
   return progress.matrix();
 }
 
