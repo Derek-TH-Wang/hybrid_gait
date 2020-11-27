@@ -20,7 +20,7 @@ template <typename T>
 bool SafetyChecker<T>::checkSafeOrientation(StateEstimatorContainer<float>& _stateEstimator) {
   if (abs(_stateEstimator.getResult().rpy(0)) >= 0.5 ||
       abs(_stateEstimator.getResult().rpy(1)) >= 0.5) {
-        printf("Orientation safety check failed!\n");
+        // printf("Orientation safety check failed!\n");
     return false;
   } else {
     return true;

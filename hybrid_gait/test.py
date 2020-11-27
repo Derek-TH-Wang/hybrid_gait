@@ -17,9 +17,9 @@ def regist(task_env):
     if task_env == 'HybridGait-v0':
         register(
             id=task_env,
-            entry_point='hybrid_gait.hybrid_gait_gym:HybridGaitGym',
+            entry_point='hybrid_gait_gym:HybridGaitGym',
         )
-        from hybrid_gait import hybrid_gait_gym
+        import hybrid_gait_gym
     else:
         print("register None")
         return None
@@ -48,11 +48,11 @@ def build_agent(env, num_procs, timesteps_per_actorbatch, optim_batchsize, outpu
         np.ceil(float(timesteps_per_actorbatch) / num_procs))
     optim_batchsize = int(np.ceil(float(optim_batchsize) / num_procs))
 
-    agent = PPO1(MlpPolicy, env, 
+    agent = PPO1(MlpPolicy, env,
                  timesteps_per_actorbatch=timesteps_per_actorbatch,
                  optim_batchsize=optim_batchsize,
                  policy_kwargs=policy_kwargs,
-                 tensorboard_log=output_dir, 
+                 tensorboard_log=output_dir,
                  verbose=1)
     return agent
 
@@ -70,14 +70,14 @@ def train(agent, env, num_train_episodes, output_dir="", int_save_freq=0):
     if (output_dir != ""):
         if (int_save_freq > 0):
             int_dir = os.path.join(output_dir, "intermedate")
-            callbacks.append(CheckpointCallback(save_freq=int_save_freq, 
-                                                save_path=int_dir, 
+            callbacks.append(CheckpointCallback(save_freq=int_save_freq,
+                                                save_path=int_dir,
                                                 name_prefix='model'))
 
-    agent.learn(total_timesteps=num_train_episodes, 
-                save_path=save_path, 
+    agent.learn(total_timesteps=num_train_episodes,
+                save_path=save_path,
                 callback=callbacks)
-    
+
     return
 
 
@@ -101,7 +101,8 @@ def test(agent, env, num_procs, num_episodes=None):
 
 def main():
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument("--task", dest="task", type=str, default="HybridGait-v0")
+    arg_parser.add_argument("--task", dest="task",
+                            type=str, default="HybridGait-v0")
     args = arg_parser.parse_args()
 
     with open('hybrid_gait/config/trainning_params.yaml') as f:

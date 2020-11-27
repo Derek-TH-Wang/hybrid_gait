@@ -91,12 +91,12 @@ void GaitCtrller::SetGaitParam(int* gaitParam) {
 
 void GaitCtrller::SetGaitType(int gaitType) {
   _gaitType = gaitType;
-  std::cout << "set gait type to: " << _gaitType << std::endl;
+  // std::cout << "set gait type to: " << _gaitType << std::endl;
 }
 
 void GaitCtrller::SetRobotMode(int mode) {
   _robotMode = mode;
-  std::cout << "set robot mode to: " << _robotMode << std::endl;
+  // std::cout << "set robot mode to: " << _robotMode << std::endl;
 }
 
 void GaitCtrller::SetRobotVel(double* vel) {
