@@ -64,6 +64,7 @@ class HybridGaitRobot(object):
             quadruped_param = yaml.safe_load(f)
             params = quadruped_param['simulation']
 
+        self.visualization = params['visualization']
         self.terrain = params['terrain']
         self.lateralFriction = params['lateralFriction']
         self.spinningFriction = params['spinningFriction']
@@ -81,7 +82,10 @@ class HybridGaitRobot(object):
         self.init_simulator()
 
     def init_simulator(self):
-        p.connect(p.GUI)  # or p.DIRECT for non-graphical version
+        if self.visualization:
+            p.connect(p.GUI)  # or p.DIRECT for non-graphical version
+        else:
+            p.connect(p.DIRECT)
         p.setAdditionalSearchPath(pybullet_data.getDataPath())  # optionally
         p.setGravity(self.sim_gravity[0],
                      self.sim_gravity[1], self.sim_gravity[2])
@@ -217,14 +221,17 @@ class HybridGaitRobot(object):
                                          (self.base_position[1] - self._last_base_pos[1])**2))
             self._last_base_pos = self.base_position
 
-            time.sleep(1.0/self.freq)
+            if self.visualization:
+                time.sleep(1.0/self.freq)
 
             robot_safe = self.cpp_gait_ctrller.get_safety_check()
             if not robot_safe:
                 break
 
-        for i in range(10):
-            obs[i] /= num_repeat  # average obs per step
+        if(num_repeat) == 0:
+            obs = np.array([np.inf]*11)
+        else:
+            obs[0:-1] /= num_repeat  # average obs per step
         obs[10] /= self._robot_dist  # energy consumption per meter
 
         return obs, robot_safe

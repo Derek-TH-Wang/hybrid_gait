@@ -1,4 +1,5 @@
 simulation:
+  visualization: False
   terrain: "plane"
   lateralFriction: 1.0
   spinningFriction: 0.0025
