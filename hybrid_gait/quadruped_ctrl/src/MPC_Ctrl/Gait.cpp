@@ -33,8 +33,8 @@ void OffsetDurationGait::setGaitParam(int nSegment, Vec4<int> offsets, Vec4<int>
   _offsetsFloat = offsets.cast<float>() / (float) nSegment;
   _durationsFloat = durations.cast<float>() / (float) nSegment;
 
-  _stance = durations[0];
-  _swing = nSegment - durations[0];
+  // _stance = durations[0];
+  // _swing = nSegment - durations[0];
 }
 
 MixedFrequncyGait::MixedFrequncyGait(int nSegment, Vec4<int> periods, float duty_cycle, const std::string &name) {
@@ -209,7 +209,8 @@ float MixedFrequncyGait::getCurrentGaitPhase() {
 
 float OffsetDurationGait::getCurrentSwingTime(float dtMPC, int leg) {
   (void)leg;
-  return dtMPC * _swing;
+  // return dtMPC * _swing;
+  return dtMPC * (_nIterations - _durations[leg]);
 }
 
 float MixedFrequncyGait::getCurrentSwingTime(float dtMPC, int leg) {
@@ -218,7 +219,8 @@ float MixedFrequncyGait::getCurrentSwingTime(float dtMPC, int leg) {
 
 float OffsetDurationGait::getCurrentStanceTime(float dtMPC, int leg) {
   (void) leg;
-  return dtMPC * _stance;
+  // return dtMPC * _stance;
+  return dtMPC * _durations[leg];
 }
 
 float MixedFrequncyGait::getCurrentStanceTime(float dtMPC, int leg) {
