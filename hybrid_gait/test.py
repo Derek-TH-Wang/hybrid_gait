@@ -48,8 +48,11 @@ def build_agent(env, num_procs, timesteps_per_actorbatch, optim_batchsize, outpu
         np.ceil(float(timesteps_per_actorbatch) / num_procs))
     optim_batchsize = int(np.ceil(float(optim_batchsize) / num_procs))
 
-    agent = PPO1(MlpPolicy, env,
+    agent = PPO1(policy=MlpPolicy, 
+                 env=env,
+                 gamma=0.95,
                  timesteps_per_actorbatch=timesteps_per_actorbatch,
+                 optim_epochs=1,
                  optim_batchsize=optim_batchsize,
                  policy_kwargs=policy_kwargs,
                  tensorboard_log=output_dir,

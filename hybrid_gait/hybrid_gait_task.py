@@ -1,4 +1,5 @@
 import numpy as np
+from mpi4py import MPI
 
 
 class HybridGaitTask(object):
@@ -7,11 +8,11 @@ class HybridGaitTask(object):
     def __init__(self,
                  weight=1.0,
                  velocity_weight=0.4,
-                 balance_weight=0.3,
-                 energy_weight=0.3,
-                 velocity_err_scale=1,
-                 balance_scale=0.3,
-                 energy_scale=10):
+                 balance_weight=0.2,
+                 energy_weight=0.4,
+                 velocity_err_scale=5,
+                 balance_scale=1,
+                 energy_scale=20):
 
         self._weight = weight
 
@@ -52,7 +53,10 @@ class HybridGaitTask(object):
         reward = self._balance_weight * balance_reward \
             + self._velocity_weight * velocity_reward \
             + self._energy_weight * energy_reward
-        print("rew = ", velocity_reward, balance_reward, energy_reward, reward)
+        
+        if MPI.COMM_WORLD.Get_rank() == 0:
+            print("rew = ", velocity_reward, balance_reward, energy_reward, reward)
+
         return reward * self._weight
 
     def _calc_reward_velocity(self, vel_diff):

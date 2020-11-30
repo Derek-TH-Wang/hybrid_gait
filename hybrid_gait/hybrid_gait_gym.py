@@ -2,6 +2,7 @@ import gym
 import numpy as np
 from gym import spaces
 from gym.utils import seeding
+from mpi4py import MPI
 
 import hybrid_gait_task
 import hybrid_gait_robot
@@ -9,7 +10,7 @@ import hybrid_gait_robot
 
 class HybridGaitGym(gym.Env):
 
-    def __init__(self, action_repeat=50):
+    def __init__(self, action_repeat=100):
         self.seed()
         self.action_repeat = action_repeat
         self.robot = hybrid_gait_robot.HybridGaitRobot(self.action_repeat)
@@ -42,14 +43,15 @@ class HybridGaitGym(gym.Env):
         for i in range(8):
             act[i+1] = act[i+1]*act[0]  # offset, duration: 0-horizon
 
-        # act = np.array([12, 6, 6, 6, 0, 12, 11, 11, 11])
+        # act = np.array([8,0,2,0,0,7,6,0,8])
 
         if(type(act) == type(np.array([1]))):
             act = act.tolist()
         if(type(act[0]) == np.float64):
             act = [act[j].item() for j in range(9)]
         act = [round(act[j]) for j in range(9)]
-        print(act)
+        if MPI.COMM_WORLD.Get_rank() == 0:
+            print(act)
 
         self.robot.set_vel(self._get_target_vel())
         obs, safe = self.robot.step(act)

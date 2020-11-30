@@ -230,7 +230,7 @@ class HybridGaitRobot(object):
                 break
 
         if(num_repeat) == 0:
-            obs = np.array([np.inf]*11)
+            obs = np.array([0.0]*11)
         else:
             obs[0:-1] /= num_repeat  # average obs per step
         obs[10] /= self._robot_dist  # energy consumption per meter
