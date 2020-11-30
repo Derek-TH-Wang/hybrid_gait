@@ -96,8 +96,8 @@ def test(agent, env, num_procs, num_episodes=None):
         action, _states = agent.predict(obs)
         # print(action)
         obs, rewards, dones, info = env.step(action)
-        if MPI.COMM_WORLD.Get_rank() == 0:
-            env.render()
+        # if MPI.COMM_WORLD.Get_rank() == 0:
+        #     env.render()
     env.close()
     return
 
