@@ -79,16 +79,16 @@ void ConvexMPCLocomotion::_SetupCommand(
   _body_height = 0.25;
 
   float x_vel_cmd, y_vel_cmd, yaw_vel_cmd;
-  float x_filter(0.01), y_filter(0.006), yaw_filter(0.03);
+  float x_filter(1.0), y_filter(1.0), yaw_filter(1.0);
 
   //手柄数据先暂时设置为0，后面再给手柄赋值   旋转角速度和x,y方向上的线速度
   x_vel_cmd = gamepadCommand[0];
   y_vel_cmd = gamepadCommand[1];
   yaw_vel_cmd = gamepadCommand[2];
 
-  _x_vel_des = _x_vel_des * (1 - x_filter) + x_vel_cmd * x_filter;  //一阶低通数字滤波
-  _y_vel_des = _y_vel_des * (1 - y_filter) + y_vel_cmd * y_filter;
-  _yaw_turn_rate = _yaw_turn_rate * (1 - yaw_filter) + yaw_vel_cmd * yaw_filter;
+  _x_vel_des = _x_vel_des * (1.0 - x_filter) + x_vel_cmd * x_filter;  //一阶低通数字滤波
+  _y_vel_des = _y_vel_des * (1.0 - y_filter) + y_vel_cmd * y_filter;
+  _yaw_turn_rate = _yaw_turn_rate * (1.0 - yaw_filter) + yaw_vel_cmd * yaw_filter;
   if(_x_vel_des > 2.0) {
     _x_vel_des = 2.0;
   } else if(_x_vel_des < -1.0) {
