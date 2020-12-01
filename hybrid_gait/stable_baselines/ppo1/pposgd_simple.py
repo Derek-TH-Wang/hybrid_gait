@@ -353,7 +353,7 @@ class PPO1(ActorCriticRLModel):
                     logger.record_tabular("EpisodesSoFar", episodes_so_far)
                     logger.record_tabular("TimestepsSoFar", self.num_timesteps)
                     logger.record_tabular("TimeElapsed", time.time() - t_start)
-                    if self.verbose >= 1 and is_root == 0:
+                    if self.verbose >= 1 and is_root:
                         logger.dump_tabular()
         callback.on_training_end()
 

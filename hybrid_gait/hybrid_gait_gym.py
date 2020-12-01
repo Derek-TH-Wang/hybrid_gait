@@ -16,6 +16,8 @@ class HybridGaitGym(gym.Env):
         self.robot = hybrid_gait_robot.HybridGaitRobot(self.action_repeat)
         self.task = hybrid_gait_task.HybridGaitTask()
 
+        self.step_time = 0
+
         self.action_space = spaces.Box(
             np.array([0.0]*9),
             np.array([1.0]*9),
@@ -31,6 +33,7 @@ class HybridGaitGym(gym.Env):
         return [self.np_random_seed]
 
     def reset(self):
+        self.step_time = 0
         obs = self.robot.reset_robot()
         return obs
 
@@ -56,11 +59,12 @@ class HybridGaitGym(gym.Env):
         self.robot.set_vel(self._get_target_vel())
         obs, safe = self.robot.step(act)
 
-        rew = self.task.get_reward(obs)
+        rew = self.task.get_reward(obs, self.step_time)
         # done = self.task.get_done(obs)
         done = False
-
         done = not safe or done
+
+        self.step_time += 1
 
         return obs, rew, done, {}
 

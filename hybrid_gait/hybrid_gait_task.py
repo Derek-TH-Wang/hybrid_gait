@@ -7,12 +7,14 @@ class HybridGaitTask(object):
 
     def __init__(self,
                  weight=1.0,
-                 velocity_weight=0.4,
+                 velocity_weight=0.3,
                  balance_weight=0.2,
-                 energy_weight=0.4,
+                 energy_weight=0.3,
+                 time_weight=0.2,
                  velocity_err_scale=5,
                  balance_scale=1,
-                 energy_scale=20):
+                 energy_scale=20,
+                 time_scale = 0.01):
 
         self._weight = weight
 
@@ -20,10 +22,12 @@ class HybridGaitTask(object):
         self._velocity_weight = velocity_weight
         self._balance_weight = balance_weight
         self._energy_weight = energy_weight
+        self._time_weight = time_weight
 
         self._velocity_err_scale = velocity_err_scale
         self._balance_scale = balance_scale
         self._energy_scale = energy_scale
+        self._time_scale = time_scale
 
         return
 
@@ -41,21 +45,22 @@ class HybridGaitTask(object):
 
     #     return done
 
-    def get_reward(self, obs):
+    def get_reward(self, obs, step_time):
         """Get the reward without side effects."""
 
         velocity_reward = self._calc_reward_velocity(obs[0:3])
         balance_reward = self._calc_reward_balance(
             obs[3:6], obs[6:8], obs[8:10])
         energy_reward = self._calc_reward_energy(obs[10])
-        # end_effector_reward = self._calc_reward_end_effector()
+        time_reward = self._calc_reward_time(step_time)
 
         reward = self._balance_weight * balance_reward \
             + self._velocity_weight * velocity_reward \
-            + self._energy_weight * energy_reward
+            + self._energy_weight * energy_reward \
+            + self._time_weight * time_reward
         
         if MPI.COMM_WORLD.Get_rank() == 0:
-            print("rew = ", velocity_reward, balance_reward, energy_reward, reward)
+            print("rew = ", velocity_reward, balance_reward, energy_reward, time_reward, reward)
 
         return reward * self._weight
 
@@ -77,3 +82,6 @@ class HybridGaitTask(object):
     def _calc_reward_energy(self, energy_consumption):
         energy_reward = np.exp(-self._energy_scale * energy_consumption)
         return energy_reward
+
+    def _calc_reward_time(self, step_time):
+        return step_time*0.01
