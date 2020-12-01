@@ -44,9 +44,9 @@ def build_agent(env, num_procs, timesteps_per_actorbatch, optim_batchsize, outpu
                       "vf": [64, 64]}],
         "act_fun": tf.nn.relu
     }
-    timesteps_per_actorbatch = int(
-        np.ceil(float(timesteps_per_actorbatch) / num_procs))
-    optim_batchsize = int(np.ceil(float(optim_batchsize) / num_procs))
+    # timesteps_per_actorbatch = int(
+    #     np.ceil(float(timesteps_per_actorbatch) / num_procs))
+    # optim_batchsize = int(np.ceil(float(optim_batchsize) / num_procs))
 
     agent = PPO1(policy=MlpPolicy, 
                  env=env,
