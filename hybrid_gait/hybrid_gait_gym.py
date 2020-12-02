@@ -46,7 +46,10 @@ class HybridGaitGym(gym.Env):
         for i in range(8):
             act[i+1] = act[i+1]*act[0]  # offset, duration: 0-horizon
 
-        # act = np.array([8,0,2,0,0,7,6,0,8])
+        # act = np.array([20,0,10,5,15,15,15,15,15]) # walk20
+        # act = np.array([16,0,8,4,12,12,12,12,12]) # walk16
+        # act = np.array([20,0,10,10,0,10,10,10,10]) # trot20
+        # act = np.array([16,0,8,8,0,8,8,8,8]) # trot16
 
         if(type(act) == type(np.array([1]))):
             act = act.tolist()
