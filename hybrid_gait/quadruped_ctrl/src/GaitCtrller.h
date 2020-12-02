@@ -67,6 +67,9 @@ GaitCtrller* gCtrller;
 
 // first step, init the controller
 void init_controller(double freq, double PIDParam[]) {
+  if (NULL != gCtrller) {
+    delete gCtrller;
+  }
   gCtrller = new GaitCtrller(freq, PIDParam);
 }
 
