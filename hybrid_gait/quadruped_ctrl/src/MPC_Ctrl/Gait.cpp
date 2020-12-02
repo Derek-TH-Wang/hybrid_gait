@@ -28,6 +28,9 @@ void OffsetDurationGait::setGaitParam(int nSegment, Vec4<int> offsets, Vec4<int>
 
   _name = name;
   // allocate memory for MPC gait table
+  if(NULL != _mpc_table) {
+    delete[] _mpc_table;
+  }
   _mpc_table = new int[nSegment * 4];
 
   _offsetsFloat = offsets.cast<float>() / (float) nSegment;

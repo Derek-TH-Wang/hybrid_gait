@@ -34,6 +34,7 @@ def regist(task_env):
 
 def build_env(task_env):
     task_env = regist(task_env)
+    # task_env = "Pendulum-v0"
     env = gym.make(task_env)
     return env
 

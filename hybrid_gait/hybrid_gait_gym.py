@@ -63,11 +63,14 @@ class HybridGaitGym(gym.Env):
         obs, safe = self.robot.step(act)
 
         rew = self.task.get_reward(obs, self.step_time)
-        # done = self.task.get_done(obs)
-        done = False
-        done = not safe or done
 
         self.step_time += 1
+
+        # done = self.task.get_done(obs)
+        done = False
+        if self.step_time > 1000:
+            done = True
+        done = not safe or done
 
         return obs, rew, done, {}
 
