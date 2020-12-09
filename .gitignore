@@ -1,3 +1,6 @@
 *.pyc
 output/*
 hybrid_gait/quadruped_ctrl/build/*
+.vscode/*
+*.zip
+*.yaml

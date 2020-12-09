@@ -161,13 +161,13 @@ class HybridGaitRobot(object):
         p.changeDynamics(self.ground, -1, lateralFriction=self.lateralFriction)
         self.quadruped = p.loadURDF("mini_cheetah/mini_cheetah.urdf", self.init_pos,
                                     useFixedBase=False)
-        p.changeDynamics(self.quadruped, 3,
+        p.changeDynamics(self.quadruped, 3, lateralFriction=self.lateralFriction, 
                          spinningFriction=self.spinningFriction)
-        p.changeDynamics(self.quadruped, 7,
+        p.changeDynamics(self.quadruped, 7, lateralFriction=self.lateralFriction, 
                          spinningFriction=self.spinningFriction)
-        p.changeDynamics(self.quadruped, 11,
+        p.changeDynamics(self.quadruped, 11, lateralFriction=self.lateralFriction, 
                          spinningFriction=self.spinningFriction)
-        p.changeDynamics(self.quadruped, 15,
+        p.changeDynamics(self.quadruped, 15, lateralFriction=self.lateralFriction, 
                          spinningFriction=self.spinningFriction)
         jointIds = []
         for j in range(p.getNumJoints(self.quadruped)):
@@ -260,7 +260,7 @@ class HybridGaitRobot(object):
         obs[0:2] += np.abs(np.array(self.target_base_vel[0:2]) -
                            np.array(self.base_vel[0:2]))  # linear xy vel
         obs[2] += np.abs(self.target_base_vel[2] -
-                         self.imu_data[8])  # angular z vel
+                         self.imu_data[9])  # angular z vel
         obs[3:6] += np.abs(base_acc)  # linear acc
         obs[6:8] += np.abs(np.array(rpy[0:2]))  # rp
         obs[8:10] += np.abs(np.array(rpy_rate[0:2]))  # rp_rate

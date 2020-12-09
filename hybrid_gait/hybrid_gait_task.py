@@ -7,10 +7,10 @@ class HybridGaitTask(object):
 
     def __init__(self,
                  weight=1.0,
-                 velocity_weight=0.3,
-                 balance_weight=0.5,
-                 energy_weight=0.1,
-                 time_weight=0.1,
+                 velocity_weight=0.2,
+                 balance_weight=0.25,
+                 energy_weight=0.5,
+                 time_weight=0.05,
                  velocity_err_scale=5,
                  balance_scale=1,
                  energy_scale=20,
@@ -58,11 +58,13 @@ class HybridGaitTask(object):
             + self._velocity_weight * velocity_reward \
             + self._energy_weight * energy_reward \
             + self._time_weight * time_reward
-        
+
+        reward = np.log(reward) * self._weight
+
         if MPI.COMM_WORLD.Get_rank() == 0:
             print("rew = {:.6f} {:.6f} {:.6f} {:.6f} {:.6f}".format(velocity_reward, balance_reward, energy_reward, time_reward, reward))
-
-        return reward * self._weight
+            # print("{:.6f}".format(reward))
+        return reward
 
     def _calc_reward_velocity(self, vel_diff):
         vel_err = np.sqrt(vel_diff.dot(vel_diff))

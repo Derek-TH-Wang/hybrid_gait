@@ -42,7 +42,7 @@ class HybridGaitGym(gym.Env):
         for i in range(9):  # sigmoid
             act[i] = 1.0/(1.0 + np.exp(-action[i]))
 
-        act[0] = act[0]*12.0+8.0  # horizon: 8-20
+        act[0] = act[0]*14.0+6.0  # horizon: 6-20
         for i in range(8):
             act[i+1] = act[i+1]*act[0]  # offset, duration: 0-horizon
 
@@ -50,6 +50,7 @@ class HybridGaitGym(gym.Env):
         # act = np.array([16,0,8,4,12,12,12,12,12]) # walk16
         # act = np.array([20,0,10,10,0,10,10,10,10]) # trot20
         # act = np.array([16,0,8,8,0,8,8,8,8]) # trot16
+        # act = np.array([12,0,6,6,0,6,6,6,6]) # trot12
 
         if(type(act) == type(np.array([1]))):
             act = act.tolist()

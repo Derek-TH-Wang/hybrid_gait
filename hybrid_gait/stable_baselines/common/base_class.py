@@ -820,8 +820,8 @@ class ActorCriticRLModel(BaseRLModel):
 
         clipped_actions = actions
         # Clip the actions to avoid out of bound error
-        if isinstance(self.action_space, gym.spaces.Box):
-            clipped_actions = np.clip(actions, self.action_space.low, self.action_space.high)
+        # if isinstance(self.action_space, gym.spaces.Box):
+        #     clipped_actions = np.clip(actions, self.action_space.low, self.action_space.high)
 
         if not vectorized_env:
             if state is not None:
