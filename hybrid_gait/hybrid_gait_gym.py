@@ -64,8 +64,8 @@ class HybridGaitGym(gym.Env):
         obs, safe = self.robot.step(act)
 
         rew = self.task.get_reward(obs, self.step_time)
-        if not np.any(act[5:9]):
-            rew = -100.0
+        # if not np.any(act[5:9]):
+        #     rew = -100.0
 
         self.step_time += 1
 

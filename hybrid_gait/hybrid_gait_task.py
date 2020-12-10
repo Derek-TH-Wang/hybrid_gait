@@ -59,7 +59,7 @@ class HybridGaitTask(object):
             + self._energy_weight * energy_reward \
             + self._time_weight * time_reward
 
-        reward = np.log(reward) * self._weight
+        reward = pow(reward, 0.5) * self._weight
 
         if MPI.COMM_WORLD.Get_rank() == 0:
             print("rew = {:.6f} {:.6f} {:.6f} {:.6f} {:.6f}".format(velocity_reward, balance_reward, energy_reward, time_reward, reward))
