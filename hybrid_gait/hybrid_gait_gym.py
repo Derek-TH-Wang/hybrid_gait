@@ -23,7 +23,7 @@ class HybridGaitGym(gym.Env):
             np.array([1.0]*9),
             dtype=np.float32)
         self.observation_space = spaces.Box(-np.inf,
-                                            np.inf, shape=(11, ), dtype='float32')
+                                            np.inf, shape=(14, ), dtype='float32')
         self.reset()
 
         return
@@ -78,7 +78,7 @@ class HybridGaitGym(gym.Env):
         return obs, rew, done, {}
 
     def _get_target_vel(self):
-        # t = self._state_action_counter/1000
+        # t = self.step_time/1000
         # nf = 5
         # w_f = 0.8
         # q0 = [0.0]
@@ -96,4 +96,4 @@ class HybridGaitGym(gym.Env):
         # qq -= q0
         # q[0] = qq.tolist()[0]/2
 
-        return [0.25, 0, 0]
+        return [0.8, 0, 0]

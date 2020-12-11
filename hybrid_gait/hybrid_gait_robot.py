@@ -204,11 +204,11 @@ class HybridGaitRobot(object):
             p.stepSimulation
         self.cpp_gait_ctrller.set_robot_mode(convert_type(2))
 
-        obs = np.array([0.0]*11)
+        obs = np.array([0.0]*14)
         return obs
 
     def step(self, gait_param):
-        obs = np.array([0.0]*11)
+        obs = np.array([0.0]*14)
         self._robot_dist = 0
 
         # for i in range(len(gait_param)):
@@ -230,10 +230,10 @@ class HybridGaitRobot(object):
                 break
 
         if(num_repeat) == 0:
-            obs = np.array([0.0]*11)
+            obs = np.array([0.0]*14)
         else:
-            obs[0:-1] /= num_repeat  # average obs per step
-        obs[10] /= self._robot_dist  # energy consumption per meter
+            obs[3:-1] /= num_repeat  # average obs per step
+        obs[-1] /= self._robot_dist  # energy consumption per meter
 
         return obs, robot_safe
 
@@ -257,14 +257,14 @@ class HybridGaitRobot(object):
         rpy_rate = self.imu_data[7:10]
         energy = self._cal_energy_consumption()
 
-        obs[0:2] += np.abs(np.array(self.target_base_vel[0:2]) -
-                           np.array(self.base_vel[0:2]))  # linear xy vel
-        obs[2] += np.abs(self.target_base_vel[2] -
-                         self.imu_data[9])  # angular z vel
-        obs[3:6] += np.abs(base_acc)  # linear acc
-        obs[6:8] += np.abs(np.array(rpy[0:2]))  # rp
-        obs[8:10] += np.abs(np.array(rpy_rate[0:2]))  # rp_rate
-        obs[10] += np.abs(np.array(energy))  # energy
+        obs[0:3] = np.abs(np.array(self.target_base_vel[0:3]))  # target linear_xy, angular_z vel
+        obs[3:5] += np.abs(np.array(self.base_vel[0:2]))  # real linear xy vel
+        obs[5] += np.abs(self.imu_data[9])  # real angular_z vel
+        obs[6:9] += np.abs(base_acc)  # linear acc
+        obs[9:11] += np.abs(np.array(rpy[0:2]))  # rp
+        obs[11:13] += np.abs(np.array(rpy_rate[0:2]))  # rp_rate
+        # obs[13:25] = np.abs(np.array())  # joint pos
+        obs[13] += np.abs(np.array(energy))  # energy
 
         return obs
 

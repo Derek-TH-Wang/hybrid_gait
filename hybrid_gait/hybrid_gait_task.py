@@ -48,10 +48,10 @@ class HybridGaitTask(object):
     def get_reward(self, obs, step_time):
         """Get the reward without side effects."""
 
-        velocity_reward = self._calc_reward_velocity(obs[0:3])
+        velocity_reward = self._calc_reward_velocity(obs[0:6])
         balance_reward = self._calc_reward_balance(
-            obs[3:6], obs[6:8], obs[8:10])
-        energy_reward = self._calc_reward_energy(obs[10])
+            obs[6:9], obs[9:11], obs[11:13])
+        energy_reward = self._calc_reward_energy(obs[13])
         time_reward = self._calc_reward_time(step_time)
 
         reward = self._balance_weight * balance_reward \
@@ -66,7 +66,8 @@ class HybridGaitTask(object):
             # print("{:.6f}".format(reward))
         return reward
 
-    def _calc_reward_velocity(self, vel_diff):
+    def _calc_reward_velocity(self, vel):
+        vel_diff = vel[0:3] - vel[3:6]
         vel_err = np.sqrt(vel_diff.dot(vel_diff))
 
         velocity_reward = np.exp(-self._velocity_err_scale * vel_err)
