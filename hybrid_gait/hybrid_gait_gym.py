@@ -1,4 +1,5 @@
 import gym
+import random
 import numpy as np
 from gym import spaces
 from gym.utils import seeding
@@ -17,6 +18,7 @@ class HybridGaitGym(gym.Env):
         self.task = hybrid_gait_task.HybridGaitTask()
 
         self.step_time = 0
+        self.target_vel = [0] * 3
 
         self.action_space = spaces.Box(
             np.array([0.0]*9),
@@ -64,8 +66,8 @@ class HybridGaitGym(gym.Env):
         obs, safe = self.robot.step(act)
 
         rew = self.task.get_reward(obs, self.step_time)
-        # if not np.any(act[5:9]):
-        #     rew = -100.0
+        if not np.any(obs):
+            rew = 0.0
 
         self.step_time += 1
 
@@ -78,22 +80,31 @@ class HybridGaitGym(gym.Env):
         return obs, rew, done, {}
 
     def _get_target_vel(self):
-        # t = self.step_time/1000
+        # t = self.step_time/5.0
         # nf = 5
         # w_f = 0.8
         # q0 = [0.0]
-        # q = [0.0] * self._num_cmd
+        # q = [0.0] * 3
         # qq = 0
-        # # if t == 0:
-        # #     a = [random.uniform(-1,1)  for _ in range(nf)]
-        # #     b = [random.uniform(-1,1)  for _ in range(nf)]
-        # a = [0.2886,-0.2428,0.6232,0.0657,-0.2985]
-        # b = [0.8780,0.7519,0.1003,0.2450,0.1741]
+        # if t == 0:
+        #     self.a = [random.uniform(-1,1)  for _ in range(nf)]
+        #     self.b = [random.uniform(-1,1)  for _ in range(nf)]
+        # # a = [0.2886,-0.2428,0.6232,0.0657,-0.2985]
+        # # b = [0.8780,0.7519,0.1003,0.2450,0.1741]
 
         # for l in range(2, nf):
-        #     qq += (a[l-2]/(w_f*l))*np.sin(w_f*l*t) - (b[l-2]/(w_f*l))*np.cos(w_f*l*t)
-        #     q0 += (a[l-2]/(w_f*l))*np.sin(w_f*l*0) - (b[l-2]/(w_f*l))*np.cos(w_f*l*0)
+        #     qq += (self.a[l-2]/(w_f*l))*np.sin(w_f*l*t) - (self.b[l-2]/(w_f*l))*np.cos(w_f*l*t)
+        #     q0 += (self.a[l-2]/(w_f*l))*np.sin(w_f*l*0) - (self.b[l-2]/(w_f*l))*np.cos(w_f*l*0)
         # qq -= q0
-        # q[0] = qq.tolist()[0]/2
+        # q[0] = qq.tolist()[0]
 
-        return [0.8, 0, 0]
+        # if MPI.COMM_WORLD.Get_rank() == 0:
+        #     print("vel = ", q)
+
+        # return [1.2, 0, 0]
+        if self.step_time%5.0 == 0:
+            self.target_vel = [random.uniform(-1,1.5), 0.0, 0.0]
+        if MPI.COMM_WORLD.Get_rank() == 0:
+            print("vel = ", self.target_vel)
+        return self.target_vel
+        # return q
