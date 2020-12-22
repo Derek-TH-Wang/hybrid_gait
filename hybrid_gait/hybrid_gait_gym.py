@@ -25,7 +25,7 @@ class HybridGaitGym(gym.Env):
             np.array([1.0]*9),
             dtype=np.float32)
         self.observation_space = spaces.Box(-np.inf,
-                                            np.inf, shape=(14, ), dtype='float32')
+                                            np.inf, shape=(15, ), dtype='float32')
         self.reset()
 
         return

@@ -76,6 +76,7 @@ class HybridGaitRobot(object):
 
         so_file = 'hybrid_gait/quadruped_ctrl/build/libquadruped_ctrl.so'
         self.cpp_gait_ctrller = ctypes.cdll.LoadLibrary(so_file)
+        self.cpp_gait_ctrller.get_prf_foot_coor.restype = ctypes.c_double
         self.cpp_gait_ctrller.toque_calculator.restype = ctypes.POINTER(
             StructPointer)
 
@@ -204,11 +205,11 @@ class HybridGaitRobot(object):
             p.stepSimulation
         self.cpp_gait_ctrller.set_robot_mode(convert_type(2))
 
-        obs = np.array([0.0]*14)
+        obs = np.array([0.0]*15)
         return obs
 
     def step(self, gait_param):
-        obs = np.array([0.0]*14)
+        obs = np.array([0.0]*15)
         self._robot_dist = 0
 
         # for i in range(len(gait_param)):
@@ -230,7 +231,7 @@ class HybridGaitRobot(object):
                 break
 
         if(num_repeat) == 0:
-            obs = np.array([0.0]*14)
+            obs = np.array([0.0]*15)
         else:
             obs[3:-1] /= num_repeat  # average obs per step
         obs[-1] /= self._robot_dist  # energy consumption per meter
@@ -255,6 +256,7 @@ class HybridGaitRobot(object):
         base_acc = np.array(self.imu_data[0:3]) + np.array(self.sim_gravity)
         rpy = p.getEulerFromQuaternion(self.imu_data[3:7])
         rpy_rate = self.imu_data[7:10]
+        avg_foot_x = self.cpp_gait_ctrller.get_prf_foot_coor()
         energy = self._cal_energy_consumption()
 
         obs[0:3] = np.abs(np.array(self.target_base_vel[0:3]))  # target linear_xy, angular_z vel
@@ -264,7 +266,8 @@ class HybridGaitRobot(object):
         obs[9:11] += np.abs(np.array(rpy[0:2]))  # rp
         obs[11:13] += np.abs(np.array(rpy_rate[0:2]))  # rp_rate
         # obs[13:25] = np.abs(np.array())  # joint pos
-        obs[13] += np.abs(np.array(energy))  # energy
+        obs[13] += np.abs(np.array(avg_foot_x))
+        obs[14] += np.abs(np.array(energy))  # energy
 
         return obs
 

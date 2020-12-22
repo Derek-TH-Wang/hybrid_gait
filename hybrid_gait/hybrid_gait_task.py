@@ -50,8 +50,8 @@ class HybridGaitTask(object):
 
         velocity_reward = self._calc_reward_velocity(obs[0:6])
         balance_reward = self._calc_reward_balance(
-            obs[6:9], obs[9:11], obs[11:13])
-        energy_reward = self._calc_reward_energy(obs[13])
+            obs[6:9], obs[9:11], obs[11:13], obs[13])
+        energy_reward = self._calc_reward_energy(obs[14])
         time_reward = self._calc_reward_time(step_time)
 
         reward = self._balance_weight * balance_reward \
@@ -73,11 +73,12 @@ class HybridGaitTask(object):
         velocity_reward = np.exp(-self._velocity_err_scale * vel_err)
         return velocity_reward
 
-    def _calc_reward_balance(self, acc, rpy, rpy_rate):
+    def _calc_reward_balance(self, acc, rpy, rpy_rate, foot_coor):
         acc_err = np.sqrt(acc.dot(acc))
         rpy_err = np.sqrt(rpy.dot(rpy*180.0/np.pi))
         rpy_rate_err = np.sqrt(rpy_rate.dot(rpy_rate))
-        balance_err = acc_err*0.1 + rpy_err*0.6 + rpy_rate_err*0.3
+        center_g_err = 100.0*foot_coor
+        balance_err = acc_err*0.1 + rpy_err*0.4 + rpy_rate_err*0.3 + center_g_err*0.2
         # print("{:.6f} {:.6f} {:.6f}".format(acc_err*0.1, rpy_err*0.6, rpy_rate_err*0.3))
         balance_reward = np.exp(-self._balance_scale * balance_err)
         return balance_reward

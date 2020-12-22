@@ -120,6 +120,7 @@ void ConvexMPCLocomotion::run(Quadruped<float>& _quadruped,
                               DesiredStateCommand<float>& _desiredStateCommand,
                               std::vector<double> gamepadCommand,
                               std::vector<int> gaitParam,
+                              double& _footXCoor, 
                               int gaitType, int robotMode) {
   bool omniMode = false;
   // Command Setup
@@ -482,6 +483,12 @@ void ConvexMPCLocomotion::run(Quadruped<float>& _quadruped,
       // Fr_des[foot] = -f_ff[foot];
     }
   }
+  _footXCoor = 0.0;
+  for(int i = 0; i < 4; i++) {
+    _footXCoor += (_legController.commands[i].pDes[0] + _quadruped.getHipLocation(i)[0]);
+  }
+  _footXCoor /= 4.0;
+  // std::cout << _footXCoor << std::endl;
   // se->set_contact_state(se_contactState); todo removed
   _stateEstimator.setContactPhase(se_contactState);
 

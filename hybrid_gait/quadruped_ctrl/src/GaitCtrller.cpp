@@ -89,6 +89,10 @@ int GaitCtrller::GetSafetyCheck() {
   return _safetyCheck;
 }
 
+double GaitCtrller::GetPrfFootCoor() {
+  return _footXCoor;
+}
+
 void GaitCtrller::SetGaitParam(int* gaitParam) {
   for(int i = 0; i<9; i++) {
     _gaitParam[i] = gaitParam[i];
@@ -190,8 +194,7 @@ void GaitCtrller::ToqueCalculator(double* imuData, double* motorData,
   }
 
   convexMPC->run(_quadruped, *_legController, *_stateEstimator,
-                 *_desiredStateCommand, _gamepadCommand, _gaitParam, _gaitType, _robotMode);
-
+                 *_desiredStateCommand, _gamepadCommand, _gaitParam, _footXCoor, _gaitType, _robotMode);
   _legController->updateCommand(&legcommand, ctrlParam);
 
   // effort.resize(12);

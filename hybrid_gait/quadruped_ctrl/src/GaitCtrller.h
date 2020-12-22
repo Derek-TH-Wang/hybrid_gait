@@ -32,6 +32,7 @@ class GaitCtrller {
   void SetLegData(double* motorData);
   void PreWork(double* imuData, double* motorData);
   int GetSafetyCheck();
+  double GetPrfFootCoor();
   void SetGaitParam(int* gaitType);
   void SetGaitType(int gaitType);
   void SetRobotMode(int mode);
@@ -42,6 +43,7 @@ class GaitCtrller {
   int _gaitType = 0;
   int _robotMode = 2;
   bool _safetyCheck = true;
+  double _footXCoor = 0.0;
   std::vector<double> _gamepadCommand;
   std::vector<int> _gaitParam;
   Vec4<float> ctrlParam;
@@ -81,6 +83,9 @@ void pre_work(double imuData[], double legData[]) {
 
 // gait params can be set in any time
 int get_safety_check() { return gCtrller->GetSafetyCheck(); }
+
+// get avg foot coor
+double get_prf_foot_coor() { return gCtrller->GetPrfFootCoor(); }
 
 // gait params can be set in any time
 void set_gait_param(int gaitParam[]) { gCtrller->SetGaitParam(gaitParam); }

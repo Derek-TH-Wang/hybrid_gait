@@ -92,7 +92,7 @@ public:
   template<typename T>
   void run(Quadruped<T> &_quadruped, LegController<T> &_legController, StateEstimatorContainer<float> &_stateEstimator,
           DesiredStateCommand<T> &_desiredStateCommand, std::vector<double> gamepadCommand, 
-          std::vector<int> gaitParam, int gaitType, int robotMode = 2);
+          std::vector<int> gaitParam, double& _footXCoor, int gaitType, int robotMode = 2);
   // void _SetupCommand(StateEstimatorContainer<float> &_stateEstimator, std::vector<double> gamepadCommand);
   bool currently_jumping = false;
 
