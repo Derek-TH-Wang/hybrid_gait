@@ -44,7 +44,7 @@ class HybridGaitGym(gym.Env):
         for i in range(9):  # sigmoid
             act[i] = 1.0/(1.0 + np.exp(-action[i]))
 
-        act[0] = act[0]*14.0+6.0  # horizon: 6-20
+        act[0] = act[0]*16.0+4.0  # horizon: 4-20
         for i in range(8):
             act[i+1] = act[i+1]*act[0]  # offset, duration: 0-horizon
 
@@ -103,7 +103,8 @@ class HybridGaitGym(gym.Env):
 
         # return [1.2, 0, 0]
         if self.step_time%5.0 == 0:
-            self.target_vel = [random.uniform(-1,1.5), 0.0, 0.0]
+            self.target_vel = [random.uniform(-1,1.5), random.uniform(-0.5,0.5), random.uniform(-0.5,0.5)]
+            # self.target_vel = [random.uniform(-1.5,2.0), 0.0, 0.0]
         if MPI.COMM_WORLD.Get_rank() == 0:
             print("vel = ", self.target_vel)
         return self.target_vel

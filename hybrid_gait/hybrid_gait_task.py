@@ -7,10 +7,10 @@ class HybridGaitTask(object):
 
     def __init__(self,
                  weight=1.0,
-                 velocity_weight=0.25,
-                 balance_weight=0.4,
+                 velocity_weight=0.3,
+                 balance_weight=0.3,
                  energy_weight=0.3,
-                 time_weight=0.05,
+                 time_weight=0.1,
                  velocity_err_scale=5,
                  balance_scale=1,
                  energy_scale=20,
