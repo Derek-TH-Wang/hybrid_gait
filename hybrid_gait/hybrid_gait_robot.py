@@ -176,7 +176,7 @@ class HybridGaitRobot(object):
             jointIds.append(j)
 
     def reset_robot(self):
-        init_pos = [0.0, -0.8, 1.6, 0.0, -0.8, 1.6, 0.0, -0.8, 1.6, 0.0, -0.8, 1.6,
+        init_pos = [0.0, -0.8, 1.7, 0.0, -0.8, 1.7, 0.0, -0.8, 1.7, 0.0, -0.8, 1.7,
                     0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         p.resetBasePositionAndOrientation(
             self.quadruped, self.init_pos, [0, 0, 0, 1])

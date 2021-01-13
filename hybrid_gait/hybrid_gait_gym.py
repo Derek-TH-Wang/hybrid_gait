@@ -48,11 +48,15 @@ class HybridGaitGym(gym.Env):
         for i in range(8):
             act[i+1] = act[i+1]*act[0]  # offset, duration: 0-horizon
 
+        # act = np.array([20,20,20,20,20,20,20,20,20]) # stand
         # act = np.array([20,0,10,5,15,15,15,15,15]) # walk20
         # act = np.array([16,0,8,4,12,12,12,12,12]) # walk16
+        # act = np.array([12,0,6,3,9,9,9,9,9]) # walk10
         # act = np.array([20,0,10,10,0,10,10,10,10]) # trot20
         # act = np.array([16,0,8,8,0,8,8,8,8]) # trot16
-        # act = np.array([12,0,6,6,0,6,6,6,6]) # trot12
+        # act = np.array([14,0,7,7,0,7,7,7,7]) # trot14
+        # act = np.array([8,0,4,4,0,4,4,4,4]) # trot8
+        # act=np.array([10,0,3,6,9,5,5,5,5]) # gallop10
 
         if(type(act) == type(np.array([1]))):
             act = act.tolist()
@@ -80,32 +84,59 @@ class HybridGaitGym(gym.Env):
         return obs, rew, done, {}
 
     def _get_target_vel(self):
-        # t = self.step_time/5.0
+        # t = self.step_time/10
         # nf = 5
         # w_f = 0.8
-        # q0 = [0.0]
         # q = [0.0] * 3
+
+        # q0 = [0.0]
         # qq = 0
         # if t == 0:
-        #     self.a = [random.uniform(-1,1)  for _ in range(nf)]
-        #     self.b = [random.uniform(-1,1)  for _ in range(nf)]
-        # # a = [0.2886,-0.2428,0.6232,0.0657,-0.2985]
-        # # b = [0.8780,0.7519,0.1003,0.2450,0.1741]
+        #     self.ax = [random.uniform(-1,1)  for _ in range(nf)]
+        #     self.bx = [random.uniform(-1,1)  for _ in range(nf)]
 
         # for l in range(2, nf):
-        #     qq += (self.a[l-2]/(w_f*l))*np.sin(w_f*l*t) - (self.b[l-2]/(w_f*l))*np.cos(w_f*l*t)
-        #     q0 += (self.a[l-2]/(w_f*l))*np.sin(w_f*l*0) - (self.b[l-2]/(w_f*l))*np.cos(w_f*l*0)
-        # qq -= q0
-        # q[0] = qq.tolist()[0]
+        #     qq += (self.ax[l-2]/(w_f*l))*np.sin(w_f*l*t) - (self.bx[l-2]/(w_f*l))*np.cos(w_f*l*t)
+        #     q0 += (self.ax[l-2]/(w_f*l))*np.sin(w_f*l*0) - (self.bx[l-2]/(w_f*l))*np.cos(w_f*l*0)
+        # # qq -= q0
+        # # q[0] = qq.tolist()[0]
+        # q[0] = qq.tolist()
 
-        # if MPI.COMM_WORLD.Get_rank() == 0:
-        #     print("vel = ", q)
+        # q0 = [0.0]
+        # qq = 0
+        # if t == 0:
+        #     self.ay = [random.uniform(-1,1)  for _ in range(nf)]
+        #     self.by = [random.uniform(-1,1)  for _ in range(nf)]
+
+        # for l in range(2, nf):
+        #     qq += (self.ay[l-2]/(w_f*l))*np.sin(w_f*l*t) - (self.by[l-2]/(w_f*l))*np.cos(w_f*l*t)
+        #     q0 += (self.ay[l-2]/(w_f*l))*np.sin(w_f*l*0) - (self.by[l-2]/(w_f*l))*np.cos(w_f*l*0)
+        # # qq -= q0
+        # # q[1] = qq.tolist()[0]
+        # q[1] = qq.tolist()
+
+        # q0 = [0.0]
+        # qq = 0
+        # if t == 0:
+        #     self.aw = [random.uniform(-1,1)  for _ in range(nf)]
+        #     self.bw = [random.uniform(-1,1)  for _ in range(nf)]
+
+        # for l in range(2, nf):
+        #     qq += (self.aw[l-2]/(w_f*l))*np.sin(w_f*l*t) - (self.bw[l-2]/(w_f*l))*np.cos(w_f*l*t)
+        #     q0 += (self.aw[l-2]/(w_f*l))*np.sin(w_f*l*0) - (self.bw[l-2]/(w_f*l))*np.cos(w_f*l*0)
+        # # qq -= q0
+        # # q[2] = qq.tolist()[0]
+        # q[2] = qq.tolist()
+
+        # q = [0.1, 0, 0]
+        # # if MPI.COMM_WORLD.Get_rank() == 0:
+        # #     print("vel = ", q)
+        # return q
 
         # return [1.2, 0, 0]
-        if self.step_time%5.0 == 0:
-            self.target_vel = [random.uniform(-1,1.5), random.uniform(-0.5,0.5), random.uniform(-0.5,0.5)]
-            # self.target_vel = [random.uniform(-1.5,2.0), 0.0, 0.0]
-        if MPI.COMM_WORLD.Get_rank() == 0:
-            print("vel = ", self.target_vel)
+        if self.step_time == 0:
+            # self.target_vel = [random.uniform(-1,1.5), random.uniform(-0.5,0.5), random.uniform(-0.5,0.5)]
+            self.target_vel = [random.uniform(0,1.5), 0.0, 0.0]
+        # if MPI.COMM_WORLD.Get_rank() == 0:
+        #     print("vel = ", self.target_vel)
         return self.target_vel
-        # return q

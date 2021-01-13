@@ -7,13 +7,13 @@ class HybridGaitTask(object):
 
     def __init__(self,
                  weight=1.0,
-                 velocity_weight=0.3,
-                 balance_weight=0.3,
+                 velocity_weight=0.1,
+                 balance_weight=0.5,
                  energy_weight=0.3,
                  time_weight=0.1,
                  velocity_err_scale=5,
                  balance_scale=1,
-                 energy_scale=20,
+                 energy_scale=15,
                  time_scale = 0.001):
 
         self._weight = weight
@@ -54,12 +54,16 @@ class HybridGaitTask(object):
         energy_reward = self._calc_reward_energy(obs[14])
         time_reward = self._calc_reward_time(step_time)
 
+        vel = np.sqrt(obs[0]**2 + obs[1]**2)
+        self._balance_weight = 0.8-0.45*np.log(vel+1)
+        self._energy_weight = 0.45*np.log(vel+1)
+
         reward = self._balance_weight * balance_reward \
             + self._velocity_weight * velocity_reward \
             + self._energy_weight * energy_reward \
             + self._time_weight * time_reward
 
-        reward = pow(reward, 3.0) * self._weight
+        reward = pow(reward, 1.0) * self._weight
 
         if MPI.COMM_WORLD.Get_rank() == 0:
             print("rew = {:.6f} {:.6f} {:.6f} {:.6f} {:.6f}".format(velocity_reward, balance_reward, energy_reward, time_reward, reward))
@@ -78,7 +82,7 @@ class HybridGaitTask(object):
         rpy_err = np.sqrt(rpy.dot(rpy*180.0/np.pi))
         rpy_rate_err = np.sqrt(rpy_rate.dot(rpy_rate))
         center_g_err = 100.0*foot_coor
-        balance_err = acc_err*0.1 + rpy_err*0.4 + rpy_rate_err*0.3 + center_g_err*0.2
+        balance_err = acc_err*0.1 + rpy_err*0.1 + rpy_rate_err*0.1 + center_g_err*0.7
         # print("{:.6f} {:.6f} {:.6f}".format(acc_err*0.1, rpy_err*0.6, rpy_rate_err*0.3))
         balance_reward = np.exp(-self._balance_scale * balance_err)
         return balance_reward
