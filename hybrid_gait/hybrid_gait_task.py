@@ -47,6 +47,8 @@ class HybridGaitTask(object):
 
     def get_reward(self, obs, step_time):
         """Get the reward without side effects."""
+        if not any(obs):
+            return 0.0
 
         velocity_reward = self._calc_reward_velocity(obs[0:6])
         balance_reward = self._calc_reward_balance(
@@ -63,7 +65,7 @@ class HybridGaitTask(object):
             + self._energy_weight * energy_reward \
             + self._time_weight * time_reward
 
-        reward = pow(reward, 1.0) * self._weight
+        reward = reward * self._weight
 
         if MPI.COMM_WORLD.Get_rank() == 0:
             print("rew = {:.6f} {:.6f} {:.6f} {:.6f} {:.6f}".format(velocity_reward, balance_reward, energy_reward, time_reward, reward))

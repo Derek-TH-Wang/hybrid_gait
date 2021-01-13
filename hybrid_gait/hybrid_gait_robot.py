@@ -38,7 +38,7 @@ class StructPointer(ctypes.Structure):
 
 class HybridGaitRobot(object):
 
-    def __init__(self, action_repeat=50):
+    def __init__(self, action_repeat=1000):
 
         self.action_repeat = action_repeat
 
