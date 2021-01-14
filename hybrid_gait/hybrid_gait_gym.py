@@ -11,7 +11,7 @@ import hybrid_gait_robot
 
 class HybridGaitGym(gym.Env):
 
-    def __init__(self, action_repeat=1000):
+    def __init__(self, action_repeat=500):
         self.seed()
         self.action_repeat = action_repeat
         self.robot = hybrid_gait_robot.HybridGaitRobot(self.action_repeat)
@@ -25,7 +25,7 @@ class HybridGaitGym(gym.Env):
             np.array([1.0]*9),
             dtype=np.float32)
         self.observation_space = spaces.Box(-np.inf,
-                                            np.inf, shape=(15, ), dtype='float32')
+                                            np.inf, shape=(16, ), dtype='float32')
         self.reset()
 
         return
@@ -57,7 +57,7 @@ class HybridGaitGym(gym.Env):
         # act = np.array([14,0,7,7,0,7,7,7,7]) # trot14
         # act = np.array([10,0,5,5,0,5,5,5,5]) # trot10
         # act = np.array([8,0,4,4,0,4,4,4,4]) # trot8
-        # act=np.array([10,0,3,6,9,5,5,5,5]) # gallop10
+        # act = np.array([10,0,3,6,9,5,5,5,5]) # gallop10
         # act = np.array([6,0,4,6,0,5,3,2,5]) #v0.05
         # act = np.array([5,0,3,4,0,3,2,2,3]) #v1.0
 
@@ -72,7 +72,7 @@ class HybridGaitGym(gym.Env):
         self.robot.set_vel(self._get_target_vel())
         obs, safe = self.robot.step(act)
 
-        rew = self.task.get_reward(obs, self.step_time)
+        rew = self.task.get_reward(obs)
 
         self.step_time += 1
 
@@ -137,8 +137,8 @@ class HybridGaitGym(gym.Env):
         # return [1.2, 0, 0]
         if self.step_time == 0:
             # self.target_vel = [random.uniform(-1,1.5), random.uniform(-0.5,0.5), random.uniform(-0.5,0.5)]
-            # self.target_vel = [random.uniform(0,1.5), 0.0, 0.0]
-            self.target_vel = [0.1, 0.0, 0.0]
+            self.target_vel = [random.uniform(0,1.5), 0.0, 0.0]
+            # self.target_vel = [0.1, 0.0, 0.0]
         if MPI.COMM_WORLD.Get_rank() == 0:
             print("vel = ", self.target_vel)
         return self.target_vel

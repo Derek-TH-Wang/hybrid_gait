@@ -205,11 +205,11 @@ class HybridGaitRobot(object):
             p.stepSimulation
         self.cpp_gait_ctrller.set_robot_mode(convert_type(2))
 
-        obs = np.array([0.0]*15)
+        obs = np.array([0.0]*16)
         return obs
 
     def step(self, gait_param):
-        obs = np.array([0.0]*15)
+        obs = np.array([0.0]*16)
         self._robot_dist = 0
 
         # for i in range(len(gait_param)):
@@ -231,10 +231,11 @@ class HybridGaitRobot(object):
                 break
 
         if(num_repeat) == 0:
-            obs = np.array([0.0]*15)
+            obs = np.array([0.0]*16)
         else:
-            obs[3:-1] /= num_repeat  # average obs per step
-        obs[-1] /= self._robot_dist  # energy consumption per meter
+            obs[3:-2] /= num_repeat  # average obs per step
+        obs[-2] /= self._robot_dist  # energy consumption per meter
+        obs[-1] = float(num_repeat+1) / self.action_repeat
 
         return obs, robot_safe
 
@@ -266,7 +267,7 @@ class HybridGaitRobot(object):
         obs[9:11] += np.abs(np.array(rpy[0:2]))  # rp
         obs[11:13] += np.abs(np.array(rpy_rate[0:2]))  # rp_rate
         # obs[13:25] = np.abs(np.array())  # joint pos
-        obs[13] += np.abs(np.array(avg_foot_x))
+        obs[13] += np.abs(np.array(avg_foot_x)) # 4 foot avg coor in robot frame 
         obs[14] += np.abs(np.array(energy))  # energy
 
         return obs
