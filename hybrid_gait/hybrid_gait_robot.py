@@ -233,9 +233,10 @@ class HybridGaitRobot(object):
         if(num_repeat) == 0:
             obs = np.array([0.0]*16)
         else:
-            obs[3:-2] /= num_repeat  # average obs per step
-        obs[-2] /= self._robot_dist  # energy consumption per meter
-        obs[-1] = float(num_repeat+1) / self.action_repeat
+            obs[3:-2] /= (num_repeat + 1)  # average obs per step
+            # obs[-2] /= self._robot_dist  # energy consumption per meter
+            obs[-2] /= (num_repeat + 1)  # avg force in step
+            obs[-1] = float(num_repeat+1) / self.action_repeat
 
         return obs, robot_safe
 
@@ -253,12 +254,17 @@ class HybridGaitRobot(object):
 
         return engergy_consumption.item()
 
+    def _cal_force_sum(self):
+        force = np.sum(np.array(self.tau)**2) / 1000.0
+        return force
+
     def _get_obs(self, obs):
         base_acc = np.array(self.imu_data[0:3]) + np.array(self.sim_gravity)
         rpy = p.getEulerFromQuaternion(self.imu_data[3:7])
         rpy_rate = self.imu_data[7:10]
         avg_foot_x = self.cpp_gait_ctrller.get_prf_foot_coor()
-        energy = self._cal_energy_consumption()
+        # energy = self._cal_energy_consumption()
+        force = self._cal_force_sum()
 
         obs[0:3] = np.abs(np.array(self.target_base_vel[0:3]))  # target linear_xy, angular_z vel
         obs[3:5] += np.abs(np.array(self.base_vel[0:2]))  # real linear xy vel
@@ -268,7 +274,8 @@ class HybridGaitRobot(object):
         obs[11:13] += np.abs(np.array(rpy_rate[0:2]))  # rp_rate
         # obs[13:25] = np.abs(np.array())  # joint pos
         obs[13] += np.abs(np.array(avg_foot_x)) # 4 foot avg coor in robot frame 
-        obs[14] += np.abs(np.array(energy))  # energy
+        # obs[14] += np.abs(np.array(energy))  # energy
+        obs[14] += np.abs(np.array(force))  # force
 
         return obs
 

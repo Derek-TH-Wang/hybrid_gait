@@ -1,24 +1,21 @@
 #!/usr/bin/env python3
 
 import os
-import rospy
-import rospkg
 import time
+import yaml
 import threading
 import random
 import ctypes
 import numpy as np
 import pybullet as p
 import pybullet_data
-from geometry_msgs.msg import Twist
-from quadruped_ctrl.srv import QuadrupedCmd, QuadrupedCmdResponse
 
 get_last_vel = [0] * 3
 robot_height = 0.30
 motor_id_list = [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14]
 init_new_pos = [0.0, -0.8, 1.6, 0.0, -0.8, 1.6, 0.0, -0.8, 1.6, 0.0, -0.8, 1.6,
                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-fix_vel_test = False
+fix_vel_test = True
 
 class StructPointer(ctypes.Structure):
     _fields_ = [("eff", ctypes.c_double * 12)]
@@ -33,7 +30,7 @@ def convert_type(input):
     if input_type is list:
         length = len(input)
         if length == 0:
-            rospy.logerr("convert type failed...input is "+input)
+            print("convert type failed...input is "+input)
             return 0
         else:
             arr = (ctypes_map[type(input[0])] * length)()
@@ -45,12 +42,8 @@ def convert_type(input):
         if input_type in ctypes_map:
             return ctypes_map[input_type](bytes(input, encoding="utf-8") if type(input) is str else input)
         else:
-            rospy.logerr("convert type failed...input is "+input)
+            print("convert type failed...input is "+input)
             return 0
-
-
-def thread_job():
-    rospy.spin()
 
 
 def get_energy_consumption(motor_tau, motor_vel):
@@ -89,22 +82,6 @@ def get_target_vel(t):
     q[1] = qq.tolist()[0]/2
 
     return q
-
-
-def callback_gait(req):
-    cpp_gait_ctrller.set_gait_type(convert_type(req.cmd))
-    return QuadrupedCmdResponse(0, "get the gait")
-
-
-def callback_mode(req):
-    cpp_gait_ctrller.set_robot_mode(convert_type(req.cmd))
-    return QuadrupedCmdResponse(0, "get the mode")
-
-
-def callback_body_vel(msg):
-    vel = [msg.linear.x, msg.linear.y, msg.angular.x]
-    cpp_gait_ctrller.set_robot_vel(convert_type(vel))
-
 
 def acc_filter(value, last_accValue):
     a = 1
@@ -239,8 +216,7 @@ def init_simulator():
             fileName="heightmaps/ground0.txt",
             heightfieldTextureScaling=128)
         ground_id = p.createMultiBody(0, terrain_shape)
-        path = rospack.get_path('quadruped_ctrl')
-        textureId = p.loadTexture(path+"/model/grass.png")
+        textureId = p.loadTexture("hybrid_gait/quadruped_ctrl/model/grass.png")
         p.changeVisualShape(ground_id, -1, textureUniqueId=textureId)
         p.resetBasePositionAndOrientation(ground_id, [1, 0, 0.2], [0, 0, 0, 1])
     elif terrain == "stairs":
@@ -260,17 +236,17 @@ def init_simulator():
         # colSphereId4 = p.createCollisionShape(
         #     p.GEOM_BOX, halfExtents=[0.03, 0.03, 0.03])
         p.createMultiBody(100, colSphereId, basePosition=[1.0, 1.0, 0.0])
-        p.changeDynamics(colSphereId, -1, lateralFriction=friction)
+        p.changeDynamics(colSphereId, -1, lateralFriction=lateralFriction, spinningFriction=spinningFriction)
         p.createMultiBody(100, colSphereId1, basePosition=[1.2, 1.0, 0.0])
-        p.changeDynamics(colSphereId1, -1, lateralFriction=friction)
+        p.changeDynamics(colSphereId1, -1, lateralFriction=lateralFriction, spinningFriction=spinningFriction)
         p.createMultiBody(100, colSphereId2, basePosition=[1.4, 1.0, 0.0])
-        p.changeDynamics(colSphereId2, -1, lateralFriction=friction)
+        p.changeDynamics(colSphereId2, -1, lateralFriction=lateralFriction, spinningFriction=spinningFriction)
         p.createMultiBody(100, colSphereId3, basePosition=[1.6, 1.0, 0.0])
-        p.changeDynamics(colSphereId3, -1, lateralFriction=friction)
+        p.changeDynamics(colSphereId3, -1, lateralFriction=lateralFriction, spinningFriction=spinningFriction)
         # p.createMultiBody(10, colSphereId4, basePosition=[2.7, 1.0, 0.0])
         # p.changeDynamics(colSphereId4, -1, lateralFriction=0.5)
 
-    p.changeDynamics(ground_id, -1, lateralFriction=friction)
+    p.changeDynamics(ground_id, -1, lateralFriction=lateralFriction)
     boxId = p.loadURDF("mini_cheetah/mini_cheetah.urdf", robot_start_pos,
                        useFixedBase=False)
 
@@ -307,25 +283,26 @@ def main():
     dist_x = 0
     dist_y = 0
     energy = 0
+    force = 0
     last_pos = [0.0, 0.0]
-    rate = rospy.Rate(freq)  # hz
+    rate = 1/500.0
     reset_flag = p.readUserDebugParameter(reset)
     low_energy_flag = p.readUserDebugParameter(low_energy_mode)
     high_performance_flag = p.readUserDebugParameter(high_performance_mode)
-    while not rospy.is_shutdown():
+    while 1:
         # check reset button state
         if(reset_flag < p.readUserDebugParameter(reset)):
             reset_flag = p.readUserDebugParameter(reset)
-            rospy.logwarn("reset the robot")
+            print("reset the robot")
             cnt = 0
             reset_robot()
         if(low_energy_flag < p.readUserDebugParameter(low_energy_mode)):
             low_energy_flag = p.readUserDebugParameter(low_energy_mode)
-            rospy.logwarn("set robot to low energy mode")
+            print("set robot to low energy mode")
             cpp_gait_ctrller.set_robot_mode(convert_type(1))
         if(high_performance_flag < p.readUserDebugParameter(high_performance_mode)):
             high_performance_flag = p.readUserDebugParameter(high_performance_mode)
-            rospy.logwarn("set robot to high performance mode")
+            print("set robot to high performance mode")
             cpp_gait_ctrller.set_robot_mode(convert_type(0))
         # get data from simulator
         imu_data, leg_data, base_pos = get_data_from_sim()
@@ -334,12 +311,25 @@ def main():
         tau = cpp_gait_ctrller.toque_calculator(convert_type(
             imu_data), convert_type(leg_data))
         if fix_vel_test:
-            vel = [0.05*flag, 0.0, 0.0] # fix vel test
+            # act = [20,20,20,20,20,20,20,20,20] # stand
+            # act = [20,0,10,5,15,15,15,15,15] # walk20
+            # act = [16,0,8,4,12,12,12,12,12] # walk16
+            # act = [12,0,6,3,9,9,9,9,9] # walk10
+            # act = [20,0,10,10,0,10,10,10,10] # trot20
+            # act = [16,0,8,8,0,8,8,8,8] # trot16
+            # act = [14,0,7,7,0,7,7,7,7] # trot14
+            # act = [10,0,5,5,0,5,5,5,5] # trot10
+            # act = [8,0,4,4,0,4,4,4,4] # trot8
+            act = [10,0,3,6,9,5,5,5,5] # gallop10
+            cpp_gait_ctrller.set_gait_param(convert_type(act))
+            vel = [2.0, 0.0, 0.0] # fix vel test
             if(cnt > 500*2):
+                cpp_gait_ctrller.set_robot_vel(convert_type(vel))
                 dist += np.sqrt((base_pos[0]-last_pos[0])**2 + (base_pos[1]-last_pos[1])**2)
                 dist_x += np.abs(base_pos[0]-last_pos[0])
                 dist_y += np.abs(base_pos[1]-last_pos[1])
                 energy += get_energy_consumption(tau.contents.eff, leg_data[12:24])
+                force += np.sum(np.array(tau.contents.eff)**2)
                 # print(energy)
             last_pos[0] = base_pos[0]
             last_pos[1] = base_pos[1]
@@ -352,13 +342,15 @@ def main():
                 #       "vy_avg = {:.6f}".format(dist_y/10), 
                 #       "dist = {:.6f}".format(dist), 
                 #       "energy = {:.6f}".format(energy/dist))
-                print("{:.2f}".format(vel[0]), "{:.6f}".format(energy/dist))
+                # print("{:.2f}".format(vel[0]), "{:.6f}".format(energy/dist))
+                print("{:.2f}".format(vel[0]), "{:.6f}".format(force))
                 cnt = 0
                 flag += 1
                 dist = 0
                 dist_x = 0
                 dist_y = 0
                 energy = 0
+                force = 0
         else:
             if(cnt > 500*2):
                 vel = get_target_vel((cnt-500*2)/1000)
@@ -400,42 +392,32 @@ def main():
         if cnt > 99999999:
             cnt = 99999999
         p.stepSimulation()
-        rate.sleep()
+        time.sleep(rate)
 
 
 if __name__ == '__main__':
-    rospy.init_node('quadruped_simulator', anonymous=True)
 
-    terrain = rospy.get_param('/simulation/terrain')
-    friction = rospy.get_param('/simulation/friction')
-    freq = rospy.get_param('/simulation/freq')
-    stand_kp = rospy.get_param('/simulation/stand_kp')
-    stand_kd = rospy.get_param('/simulation/stand_kd')
-    joint_kp = rospy.get_param('/simulation/joint_kp')
-    joint_kd = rospy.get_param('/simulation/joint_kd')
-    rospy.loginfo("friction = " + str(friction) + " freq = " + str(freq) + " PID = " +
-                  str([stand_kp, stand_kd, joint_kp, joint_kd]))
 
-    rospack = rospkg.RosPack()
-    path = rospack.get_path('quadruped_ctrl')
-    so_file = path.replace('src/quadruped_ctrl',
-                           'devel/lib/libquadruped_ctrl.so')
-    if(not os.path.exists(so_file)):
-        so_file = path.replace('src/quadruped_ctrl',
-                               'build/lib/libquadruped_ctrl.so')
-    if(not os.path.exists(so_file)):
-        rospy.logerr("cannot find cpp.so file")
+    with open('hybrid_gait/quadruped_ctrl/config/quadruped_ctrl_config.yaml') as f:
+        quadruped_param = yaml.safe_load(f)
+        params = quadruped_param['simulation']
+
+    visualization = params['visualization']
+    terrain = params['terrain']
+    lateralFriction = params['lateralFriction']
+    spinningFriction = params['spinningFriction']
+    freq = params['freq']
+    stand_kp = params['stand_kp']
+    stand_kd = params['stand_kd']
+    joint_kp = params['joint_kp']
+    joint_kd = params['joint_kd']
+
+    so_file = 'hybrid_gait/quadruped_ctrl/build/libquadruped_ctrl.so'
     cpp_gait_ctrller = ctypes.cdll.LoadLibrary(so_file)
-    cpp_gait_ctrller.toque_calculator.restype = ctypes.POINTER(StructPointer)
-    rospy.loginfo("find so file = " + so_file)
-
-    s = rospy.Service('gait_type', QuadrupedCmd, callback_gait)
-    s1 = rospy.Service('robot_mode', QuadrupedCmd, callback_mode)
-    rospy.Subscriber("cmd_vel", Twist, callback_body_vel, buff_size=10000)
+    cpp_gait_ctrller.get_prf_foot_coor.restype = ctypes.c_double
+    cpp_gait_ctrller.toque_calculator.restype = ctypes.POINTER(
+        StructPointer)
 
     init_simulator()
-
-    add_thread = threading.Thread(target=thread_job)
-    add_thread.start()
 
     main()

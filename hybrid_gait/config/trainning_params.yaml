@@ -1,6 +1,6 @@
 HybridGait-v0:
   mode: "train"
-  # model_file: "output/model.zip"
+  # model_file: "model.zip"
   model_file: ""
   timesteps_per_actorbatch: 256
   optim_batchsize: 64
