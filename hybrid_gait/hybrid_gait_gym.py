@@ -11,7 +11,7 @@ import hybrid_gait_robot
 
 class HybridGaitGym(gym.Env):
 
-    def __init__(self, action_repeat=500):
+    def __init__(self, action_repeat=400):
         self.seed()
         self.action_repeat = action_repeat
         self.robot = hybrid_gait_robot.HybridGaitRobot(self.action_repeat)
@@ -58,6 +58,7 @@ class HybridGaitGym(gym.Env):
         # act = np.array([10,0,5,5,0,5,5,5,5]) # trot10
         # act = np.array([8,0,4,4,0,4,4,4,4]) # trot8
         # act = np.array([10,0,3,6,9,5,5,5,5]) # gallop10
+        # act = np.array([8,0,2,5,8,4,4,4,4]) # gallop8
         # act = np.array([6,0,4,6,0,5,3,2,5]) #v0.05
         # act = np.array([5,0,3,4,0,3,2,2,3]) #v1.0
 
@@ -137,8 +138,8 @@ class HybridGaitGym(gym.Env):
         # return [1.2, 0, 0]
         if self.step_time == 0:
             # self.target_vel = [random.uniform(-1,1.5), random.uniform(-0.5,0.5), random.uniform(-0.5,0.5)]
-            self.target_vel = [random.uniform(0,1.5), 0.0, 0.0]
-            # self.target_vel = [0.1, 0.0, 0.0]
+            self.target_vel = [random.uniform(0,2.0), 0.0, 0.0]
+            # self.target_vel = [1.0, 0.0, 0.0]
         if MPI.COMM_WORLD.Get_rank() == 0:
             print("vel = ", self.target_vel)
         return self.target_vel

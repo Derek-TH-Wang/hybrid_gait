@@ -62,6 +62,13 @@ class HybridGaitTask(object):
         # vel = np.sqrt(obs[0]**2 + obs[1]**2)
         # self._balance_weight = 0.8-0.45*np.log(vel+1)
         # self._energy_weight = 0.45*np.log(vel+1)
+        vel = np.sqrt(obs[0]**2 + obs[1]**2)
+        self._energy_weight = 0.4*vel
+        if self._energy_weight > 0.6:
+            self._energy_weight = 0.6
+        elif self._energy_weight < 0.2:
+            self._energy_weight = 0.2
+        self._balance_weight = 0.8 - self._energy_weight
 
         reward = self._balance_weight * balance_reward \
             + self._velocity_weight * velocity_reward \
