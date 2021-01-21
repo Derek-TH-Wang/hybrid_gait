@@ -47,7 +47,7 @@ class HybridGaitRobot(object):
         self.sim_gravity = [0.0, 0.0, -9.8]
 
         self.init_pos = [0, 0, 0.3]
-        self.motor_id_list = [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14]
+        self.motor_id_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
         self.tau = [0]*12
         self.imu_data = [0]*10
@@ -160,7 +160,7 @@ class HybridGaitRobot(object):
             # p.changeDynamics(colSphereId4, -1, lateralFriction=0.5)
 
         p.changeDynamics(self.ground, -1, lateralFriction=self.lateralFriction)
-        self.quadruped = p.loadURDF("mini_cheetah/mini_cheetah.urdf", self.init_pos,
+        self.quadruped = p.loadURDF("hybrid_gait/quadruped_ctrl/model//mini_cheetah.urdf", self.init_pos,
                                     useFixedBase=False)
         p.changeDynamics(self.quadruped, 3, lateralFriction=self.lateralFriction, 
                          spinningFriction=self.spinningFriction)
@@ -194,7 +194,7 @@ class HybridGaitRobot(object):
                 self.imu_data), convert_type(self.leg_data))
             p.stepSimulation()
 
-        for j in range(16):
+        for j in range(12):
             force = 0
             p.setJointMotorControl2(
                 self.quadruped, j, p.VELOCITY_CONTROL, force=force)
