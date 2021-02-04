@@ -49,15 +49,17 @@ class HybridGaitGym(gym.Env):
             act[i+1] = act[i+1]*act[0]  # offset, duration: 0-horizon
 
         # act = np.array([20,20,20,20,20,20,20,20,20]) # stand
+        # act = np.array([24,0,12,6,18,18,18,18,18]) # 24
         # act = np.array([20,0,10,5,15,15,15,15,15]) # walk20
         # act = np.array([16,0,8,4,12,12,12,12,12]) # walk16
+        # act = np.array([16,0,8,8,0,12,12,12,12]) # ???
         # act = np.array([12,0,6,3,9,9,9,9,9]) # walk10
         # act = np.array([20,0,10,10,0,10,10,10,10]) # trot20
         # act = np.array([16,0,8,8,0,8,8,8,8]) # trot16
         # act = np.array([14,0,7,7,0,7,7,7,7]) # trot14
         # act = np.array([10,0,5,5,0,5,5,5,5]) # trot10
         # act = np.array([8,0,4,4,0,4,4,4,4]) # trot8
-        # act = np.array([10,0,3,6,9,5,5,5,5]) # gallop10
+        # act = np.array([10,0,2,7,9,5,5,5,5]) # gallop10
         # act = np.array([8,0,2,5,8,4,4,4,4]) # gallop8
         # act = np.array([6,0,4,6,0,5,3,2,5]) #v0.05
         # act = np.array([5,0,3,4,0,3,2,2,3]) #v1.0
@@ -138,7 +140,7 @@ class HybridGaitGym(gym.Env):
         # return [1.2, 0, 0]
         if self.step_time == 0:
             # self.target_vel = [random.uniform(-1,1.5), random.uniform(-0.5,0.5), random.uniform(-0.5,0.5)]
-            self.target_vel = [random.uniform(0,2.0), 0.0, 0.0]
+            self.target_vel = [random.uniform(-1.5,2.5), 0.0, 0.0]
             # self.target_vel = [1.0, 0.0, 0.0]
         if MPI.COMM_WORLD.Get_rank() == 0:
             print("vel = ", self.target_vel)
