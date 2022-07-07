@@ -1,0 +1,7 @@
+gym==0.11
+stable-baselines[mpi]
+scikit-build
+pybullet
+tensorflow==1.14
+typing
+pyyaml

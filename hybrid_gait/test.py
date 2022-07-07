@@ -8,7 +8,7 @@ import gym
 from gym import envs
 from gym.envs.registration import register
 
-from stable_baselines import PPO1
+from stable_baselines import ppo1
 from stable_baselines.common.policies import MlpPolicy
 from stable_baselines.common.callbacks import CheckpointCallback
 
