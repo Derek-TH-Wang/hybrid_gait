@@ -4,7 +4,7 @@ This repo contain a RL training env for the MIT mini cheetah quadruped robot.
 
 The training task is to train the different gait type according to the various vel input.
 
-The algorithm stucture is hybrid, which means we use RL to train the 4 gait params(gait period, gait offset, gait duration). Then the gait params are as the input to the MPC controller, which calculate the joint torque.
+The algorithm stucture is hybrid, which means we use RL to train the 4 gait params(gait_type, gait period, gait offset, gait duration). Then the gait params are as the input to the MPC controller, which calculate the joint torque.
 
 We use openai-gym as the RL framework, and use stable-baselines(PPO) as the RL algorithm lib.
 
@@ -36,7 +36,7 @@ mode: train or test
 model_file: empty or specific file
 ```
 
-##run
+## run
 
 ```
 python3 hybrid_gait/test.py
