@@ -11,6 +11,7 @@ We use openai-gym as the RL framework, stable-baselines(PPO) as the RL algorithm
 The MPC controller we use the repo of ```https://github.com/Derek-TH-Wang/quadruped_ctrl```
 
 [![Watch the video](https://github.com/Derek-TH-Wang/hybrid_gait/blob/main/demo.png)](https://github.com/Derek-TH-Wang/hybrid_gait/blob/main/demo.mp4)
+https://github.com/Derek-TH-Wang/hybrid_gait/blob/main/demo.mp4
 
 ## installation
 ### python
