@@ -6,10 +6,11 @@ The training task is to train the different gait type according to the various v
 
 The algorithm stucture is hybrid, which means we use RL to train the 4 gait params(gait_type, gait period, gait offset, gait duration). Then the gait params are as the input to the MPC controller, which calculate the joint torque.
 
-We use openai-gym as the RL framework, and use stable-baselines(PPO) as the RL algorithm lib.
+We use openai-gym as the RL framework, stable-baselines(PPO) as the RL algorithm lib.
 
 The MPC controller we use the repo of ```https://github.com/Derek-TH-Wang/quadruped_ctrl```
 
+[![Watch the video](https://i.imgur.com/vKb2F1B.png)](https://youtu.be/vt5fpE0bzSY)
 
 ## installation
 ### python
